@@ -10,9 +10,14 @@ from glob import glob
 
 # analysis
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+from statsmodels.graphics.gofplots import qqplot
 from statsmodels.tsa.stattools import adfuller, kpss
 import matplotlib.pyplot as plt
 import seaborn as sns
+import scipy 
+from scipy.stats import kurtosis, skew
+
+ 
 
 # metrics
 from sklearn.metrics import mean_absolute_error, mean_squared_error, mean_absolute_percentage_error, mean_squared_log_error
@@ -57,6 +62,7 @@ def load_last_final_data(file_name:str=None, from_folder:str='final'):
     df = pd.read_csv(path_to_read_final_data, parse_dates=column_to_parse_dates)
     df.set_index(column_to_parse_dates, inplace=True)
     df = df[(df.index > pd.to_datetime('2020-02-20')) & (df.index < pd.to_datetime('2021-12-01'))]
+    # df = df[(df.index > pd.to_datetime('2020-03-22')) & (df.index < pd.to_datetime('2021-12-01'))]
     return df
 
 # analysis
@@ -99,7 +105,6 @@ def plot_multistep(y, every=1, ax=None, palette_kwargs=None):
     return ax
 
 
-
 def plot_acf_pacf(series, title=None, seasonal=True, method=None, **kwargs):
     """Plot acf and pacf of given timeseries"""
     fig, ax = plt.subplots(1, 2)
@@ -114,6 +119,49 @@ def plot_acf_pacf(series, title=None, seasonal=True, method=None, **kwargs):
     if title:
         fig.suptitle(title, fontsize=16)
     plt.show()
+
+def standarize_residuals(residuals):
+    return (residuals - residuals.mean()) / residuals.std()
+
+def diagnostic_checking_residuals(residuals, standarized_residuals=True):
+    """
+    Diagnostic checking of the residuals
+    """
+    if standarized_residuals:
+        residuals = standarize_residuals(residuals)
+        standarized_flag = 'Standarized '
+    else:
+        standarized_flag = ''
+
+    fig, axs = plt.subplots(2, 2, figsize=(15, 10))
+    # line plot of residuals or standardized residuals
+    axs[0,0].plot(residuals)
+    axs[0,0].axhline(0, color='b', linestyle='--')
+    axs[0,0].set_title(f'{standarized_flag}Residuals')
+    # histogram plus estimated density of standarized residuals, along with a N(0,1) density plotted for reference
+    sns.distplot(residuals, ax=axs[0,1])
+    x_axis=np.arange(-4,4,0.001)
+    axs[0,1].plot(x_axis, 
+        scipy.stats.norm.pdf(x_axis, 0,1), 'r', label='N(0,1)')
+    axs[0,1].set_title(f'Histogram of {standarized_flag}residuals')
+    axs[0,1].legend()
+    # normal q-q plot, with Normal reference line
+    qqplot(residuals, line='s', ax=axs[1,0])
+    axs[1,0].set_title('Normal Q-Q plot')
+    # correlogram of the residuals to explore its randomness
+    plot_acf(residuals, lags=40, bartlett_confint=False, ax=axs[1,1])
+    axs[1,1].set_title(f'Correlogram of {standarized_flag} residuals')
+
+    plt.show()
+
+def residuals_stats(residuals):
+    """
+    Calculate the statistics of the residuals
+    """
+    residuals_stats = pd.DataFrame(residuals).describe().T
+    residuals_stats['kurtosis'] = kurtosis(residuals) # excess kurtosis of normal distribution (if normal, kurtosis is zero)
+    residuals_stats['skewness'] = skew(residuals) # skewness of normal distribution (if normal, skewness is zero)
+    return residuals_stats
 
 # tests to check stationarity
 def adf_test(timeseries, print_only_result=True):
