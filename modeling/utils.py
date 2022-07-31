@@ -137,6 +137,9 @@ def diagnostic_checking_residuals(residuals, standarized_residuals=True):
     # line plot of residuals or standardized residuals
     axs[0,0].plot(residuals)
     axs[0,0].axhline(0, color='b', linestyle='--')
+    axs[0,0].axhline(-3, color='r', linestyle='--')
+    axs[0,0].axhline(3, color='r', linestyle='--')
+
     axs[0,0].set_title(f'{standarized_flag}Residuals')
     # histogram plus estimated density of standarized residuals, along with a N(0,1) density plotted for reference
     sns.distplot(residuals, ax=axs[0,1])
