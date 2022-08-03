@@ -62,7 +62,7 @@ def load_last_final_data(file_name:str=None, from_folder:str='final'):
     df = pd.read_csv(path_to_read_final_data, parse_dates=column_to_parse_dates)
     df.set_index(column_to_parse_dates, inplace=True)
     df = df[(df.index > pd.to_datetime('2020-02-20')) & (df.index < pd.to_datetime('2021-12-01'))]
-    # df = df[(df.index > pd.to_datetime('2020-03-22')) & (df.index < pd.to_datetime('2021-12-01'))]
+    # df = df[(df.index > pd.to_datetime('2020-03-20')) & (df.index < pd.to_datetime('2021-12-01'))]
     return df
 
 # analysis
