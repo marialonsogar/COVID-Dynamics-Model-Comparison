@@ -13,6 +13,7 @@ from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from statsmodels.graphics.gofplots import qqplot
 from statsmodels.tsa.stattools import adfuller, kpss
 import matplotlib.pyplot as plt
+plt.style.use('seaborn-whitegrid')
 import seaborn as sns
 import scipy 
 from scipy.stats import kurtosis, skew
@@ -54,7 +55,7 @@ def load_last_final_data(file_name:str=None, from_folder:str='final'):
     else:
         # path to read final data
         path_to_read_final_data = base_dir / 'data' / f'{from_folder}-data' / file_name
-
+    print(path_to_read_final_data)
     # load data
     if from_folder == 'raw':
         column_to_parse_dates = ['fecha']
@@ -233,7 +234,7 @@ def RMSE(y_true:np.ndarray, y_pred:np.ndarray) -> np.float64:
 
 metrics = {'RMSLE': RMSLE, 'MAE': mean_absolute_error, 'RMSE': RMSE, 'MAPE': mean_absolute_percentage_error}
 
-def plot_evaluation_evolution_through_steps(evaluation):
+def plot_evaluation_evolution_through_steps(evaluation, ax=None):
     """ 
     Plot the evaluation evolution through steps. 
     
@@ -246,4 +247,37 @@ def plot_evaluation_evolution_through_steps(evaluation):
     baseline_colors = ['lightsteelblue', 'peachpuff', 'palegreen', 'salmon']
     pd.DataFrame(evaluation).T.loc['baseline_step_1'::2,:].plot(ax=ax, subplots=True, color=baseline_colors)
     pd.DataFrame(evaluation).T.loc[::2,:].plot(ax=ax, subplots=True)
+    plt.show()
+
+def plot_all_predictions(y_fit_train, y_fit_test, df, model_name='',window_size=14 ):    
+    palette = dict(palette='husl', n_colors=64)
+    # fig, ax1 = plt.subplots(1, 1, figsize=(11, 6))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 6))
+
+    # train data
+    ax1 = df['Infected'][y_fit_train.index].plot(color='grey', zorder=0, ax=ax1)
+    y_fit_train['y_step_1'].plot(ax=ax1, color='k', style='.-', legend='First Forecast')
+    plot_multistep(y_fit_train, ax=ax1, palette_kwargs=palette)
+    _ = ax1.legend(['Actual series', 'First step forecast', 'Forecast'])
+
+    # test data
+    ax2 = df['Infected'][y_fit_test.index].plot(color='grey', zorder=0, ax=ax2)
+    y_fit_test['y_step_1'].plot(ax=ax2, color='k', style='.-', legend='First Forecast')
+    plot_multistep(y_fit_test, ax=ax2, palette_kwargs=palette)
+    _ = ax2.legend(['Actual series', 'First step forecast', 'Forecast'])
+
+    # set title
+    ax1.set_title('Train data')
+    ax2.set_title('Test data')
+    fig.suptitle(f'{model_name} model for window size {window_size} and steps ahead 14')
+
+    # label axes
+    ax1.set_xlabel('Date')
+    ax1.set_ylabel('Infected')
+    ax2.set_xlabel('Date')
+    ax2.set_ylabel('Infected')
+
+    # set same y scale for both axes
+    ax2.set_ylim(ax1.get_ylim())
+
     plt.show()
