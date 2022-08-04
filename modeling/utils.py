@@ -49,6 +49,7 @@ def load_last_final_data(file_name:str=None, from_folder:str='final'):
         list_of_files = glob(str(path_to_read_last_final_data))
         list_of_valid_files = [file for file in list_of_files if file.endswith('2022.csv')]
         path_to_read_final_data = max(list_of_valid_files, key=os.path.getctime)
+        
     # if file_name is provided, load the file
     else:
         # path to read final data
