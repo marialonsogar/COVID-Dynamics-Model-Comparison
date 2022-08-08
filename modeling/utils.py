@@ -18,9 +18,8 @@ import seaborn as sns
 import scipy 
 from scipy.stats import kurtosis, skew
 
- 
-
 # metrics
+import tensorflow as tf
 from sklearn.metrics import mean_absolute_error, mean_squared_error, mean_absolute_percentage_error, mean_squared_log_error
 
 #=======================END==============================
@@ -231,6 +230,19 @@ def RMSE(y_true:np.ndarray, y_pred:np.ndarray) -> np.float64:
             RMSE score
     """
     return np.sqrt(mean_squared_error(y_true, y_pred))
+
+def RMSLETF(y_pred:tf.Tensor, y_true:tf.Tensor) -> tf.float64:
+    """
+    The Root Mean Squared Log Error (RMSLE) metric for TensorFlow / Keras
+     
+    :param y_true: The ground truth labels given in the dataset
+    :param y_pred: Predicted values
+    :return: The RMSLE score
+    """
+    y_pred = tf.cast(y_pred, tf.float64)
+    y_true = tf.cast(y_true, tf.float64) 
+    y_pred = tf.nn.relu(y_pred) 
+    return tf.sqrt(tf.reduce_mean(tf.math.squared_difference(tf.math.log1p(y_pred+1.), tf.math.log1p(y_true+1.))))
 
 metrics = {'RMSLE': RMSLE, 'MAE': mean_absolute_error, 'RMSE': RMSE, 'MAPE': mean_absolute_percentage_error}
 
