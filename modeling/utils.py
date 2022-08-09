@@ -167,6 +167,32 @@ def residuals_stats(residuals):
     residuals_stats['skewness'] = skew(residuals) # skewness of normal distribution (if normal, skewness is zero)
     return residuals_stats
 
+def plot_history(log_key, object):
+    fig, axs = plt.subplots(1,5, figsize=(20, 4), tight_layout=True)
+
+    axs[0].plot(object.history_log[log_key].history['loss'], label='loss')
+    axs[0].plot(object.history_log[log_key].history['val_loss'], label='val_loss')
+    axs[0].set_title('loss')
+
+    axs[1].plot(object.history_log[log_key].history['RMSLETF'], label='RMSLETF')
+    axs[1].plot(object.history_log[log_key].history['val_RMSLETF'], label='val_RMSLETF')
+    axs[1].set_title('RMSLETF')
+
+    axs[2].plot(object.history_log[log_key].history['mae'], label='mae')
+    axs[2].plot(object.history_log[log_key].history['val_mae'], label='val_mae')
+    axs[2].set_title('mae')
+
+    axs[3].plot(object.history_log[log_key].history['root_mean_squared_error'], label='root_mean_squared_error')
+    axs[3].plot(object.history_log[log_key].history['val_root_mean_squared_error'], label='val_root_mean_squared_error')
+    axs[3].set_title('root_mean_squared_error')
+
+    axs[4].plot(object.history_log[log_key].history['mean_absolute_percentage_error'], label='mean_absolute_percentage_error')
+    axs[4].plot(object.history_log[log_key].history['val_mean_absolute_percentage_error'], label='val_mean_absolute_percentage_error')
+    axs[4].set_title('mean_absolute_percentage_error') 
+
+    plt.suptitle(f'{log_key}')
+    plt.show()
+
 # tests to check stationarity
 def adf_test(timeseries, print_only_result=True):
     """"Augmented Dickey-Fuller test""" 
