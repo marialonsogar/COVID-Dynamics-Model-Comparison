@@ -174,9 +174,19 @@ def plot_history(log_key, object):
     axs[0].plot(object.history_log[log_key].history['val_loss'], label='val_loss')
     axs[0].set_title('loss')
 
-    axs[1].plot(object.history_log[log_key].history['RMSLETF'], label='RMSLETF')
-    axs[1].plot(object.history_log[log_key].history['val_RMSLETF'], label='val_RMSLETF')
-    axs[1].set_title('RMSLETF')
+    try:
+        axs[1].plot(object.history_log[log_key].history['RMSLETF'], label='RMSLETF')
+        axs[1].plot(object.history_log[log_key].history['val_RMSLETF'], label='val_RMSLETF')
+        axs[1].set_title('RMSLETF')
+    except:
+        pass
+
+    try:
+        axs[1].plot(object.history_log[log_key].history['RMSLE'], label='RMSLE')
+        axs[1].plot(object.history_log[log_key].history['val_RMSLE'], label='val_RMSLE')
+        axs[1].set_title('RMSLETF')
+    except:
+        pass
 
     axs[2].plot(object.history_log[log_key].history['mae'], label='mae')
     axs[2].plot(object.history_log[log_key].history['val_mae'], label='val_mae')
@@ -186,9 +196,12 @@ def plot_history(log_key, object):
     axs[3].plot(object.history_log[log_key].history['val_root_mean_squared_error'], label='val_root_mean_squared_error')
     axs[3].set_title('root_mean_squared_error')
 
-    axs[4].plot(object.history_log[log_key].history['mean_absolute_percentage_error'], label='mean_absolute_percentage_error')
-    axs[4].plot(object.history_log[log_key].history['val_mean_absolute_percentage_error'], label='val_mean_absolute_percentage_error')
-    axs[4].set_title('mean_absolute_percentage_error') 
+    try:
+        axs[4].plot(object.history_log[log_key].history['mean_absolute_percentage_error'], label='mean_absolute_percentage_error')
+        axs[4].plot(object.history_log[log_key].history['val_mean_absolute_percentage_error'], label='val_mean_absolute_percentage_error')
+        axs[4].set_title('mean_absolute_percentage_error') 
+    except:
+        pass
 
     plt.suptitle(f'{log_key}')
     plt.show()
